@@ -16,8 +16,13 @@ from telegram.request import HTTPXRequest
 
 # ==================== CONFIGURATION SECTION ====================
 
-BOT_TOKEN = "8065123892:AAGnS9EqZyR3lLAHWfD7S9CuWK6eWtCdpcw"
-ADMINS = [1814825552]
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMINS = [int(os.getenv("ADMIN_ID"))]
 
 # ডাটা ফাইল নির্দেশিকা
 USER_DATA_FILE = "users.json"
@@ -31,13 +36,13 @@ ACTIVE_NUMBERS_FILE = "active_numbers.json"
 MANUAL_RANGES_FILE = "manual_ranges.json"
 
 DEFAULT_SETTINGS = {
-    "api_key": "3e725522f5759b8212776aed6c615f1a6f1da525",
-    "base_url": "https://axnumberserver.shop/number/api",
-    "otp_group_id": "-1004372443286",  # অ্যাডমিন প্যানেল থেকে ডাইনামিক পরিবর্তনযোগ্য
-    "welcome_message": "⚡ <b>NUMBER BOT SYSTEM</b> ⚡\n━━━━━━━━━━━━━━━━━━━━━━━━\n<b>স্ট্যান্ট ওটিপি রিসিভ করা শুরু করুন!</b>\n━━━━━━━━━━━━━━━━━━━━━━━━",
-    "otp_group_url": "https://t.me/myotpchanne",
-    "channel_url": "https://t.me/myotpchanne",
-    "support_username": "admin",
+    "api_key": os.getenv("API_KEY"),
+    "base_url": os.getenv("BASE_URL"),
+    "otp_group_id": os.getenv("OTP_GROUP_ID"),
+    "otp_group_url": os.getenv("OTP_GROUP_URL"),
+    "channel_url": os.getenv("CHANNEL_URL"),
+    "support_username": os.getenv("SUPPORT_USERNAME"),
+
     "maintenance_mode": False,
     "min_withdraw": 0.5,
     "max_withdraw": 100.0,
@@ -707,7 +712,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except: pass
 
     settings = load_settings()
-    await update.message.reply_text(settings.get("welcome_message"), parse_mode="HTML", reply_markup=main_keyboard(uid))
+    text = settings.get("welcome_message") or "👋 Welcome to AutoSyncX Bot!"
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    settings = load_settings()
+    text = settings.get("welcome_message") or "👋 Welcome!"
+
+    await update.message.reply_text(
+        text,
+        parse_mode="HTML",
+        reply_markup=main_keyboard(update.effective_user.id)
+    )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text: return
